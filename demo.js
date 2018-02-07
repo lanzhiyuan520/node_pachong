@@ -97,7 +97,6 @@ let video = (i,url)=>{
     })
 }
 
-
 let movie = (url)=>{
     var music = []
     superagent.get(url).end((err,res)=>{
@@ -113,10 +112,81 @@ let movie = (url)=>{
     })
 }
 var u = 'https://music.douban.com/chart'
+
+
+
+//第二种爬虫
+
+var video_list = []
+var s = []
+var charset = require('superagent-charset');
+charset(superagent)
+
+var page = 1;
+
+let S = (v)=>{
+    v.forEach((m,i)=>{
+        Mongoclient.connect(URLS,(err,db)=>{
+            assert.equal(null,err)
+            db.collection('video3').insert({v_name:m.title,bt:m.seed},(err,result)=>{
+                if (err) return err;
+                console.log('数据'+i+'已经存入数据库')
+                db.close()
+            })
+        })
+    })
+
+}
+let seed = (p,video_list)=>{
+    superagent.get(`${URL}${video_list[p-1].href}`).charset('gbk').end((err,res)=>{
+        if (err) {
+            return err
+        }
+        console.log(`${URL}${video_list[p-1].href}`)
+        console.log("正在爬取第"+p+"个种子")
+        var $ = cheerio.load(res.text)
+        $('#Zoom td').children('a').each((index,item)=>{
+            var $item = $(item)
+            video_list[p-1].seed = $item.attr('href')
+        })
+        if (p == video_list.length){
+            console.log('爬取种子完毕')
+            console.log(video_list)
+            S(video_list)
+        }else{
+            seed(++page,video_list)
+        }
+    })
+}
+let v = (i,u)=>{
+    superagent.get(`${u}${i}.html`).charset('gbk').end((err,res)=>{
+        if (err) {
+            return err
+        }
+        console.log("开始爬取第"+i+"页")
+        var $ = cheerio.load(res.text);
+        $('.co_content8 .ulink').each((index,item)=>{
+            var $item = $(item)
+            video_list.push({
+                title:$item.text(),
+                href:$item.attr('href')
+            })
+        })
+        if (i == 5){
+            console.log(video_list)
+            console.log("爬取完毕")
+            console.log("开始爬取种子")
+            seed(page,video_list)
+        }else{
+            v(++index,u)
+        }
+    })
+}
 let main = (i,url)=>{
     console.log('开始爬取')
     //video(i,url)   //先爬取页数
-    movie(u)
+    //movie(u)
+    v(i,url)
 }
 
 main(index,url)
