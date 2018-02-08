@@ -128,7 +128,7 @@ let S = (v)=>{
     v.forEach((m,i)=>{
         Mongoclient.connect(URLS,(err,db)=>{
             assert.equal(null,err)
-            db.collection('video3').insert({v_name:m.title,bt:m.seed},(err,result)=>{
+            db.collection('movie').insert({v_name:m.title,bt:m.seed},(err,result)=>{
                 if (err) return err;
                 console.log('数据'+i+'已经存入数据库')
                 db.close()
@@ -185,7 +185,6 @@ let v = (i,u)=>{
 let main = (i,url)=>{
     console.log('开始爬取')
     //video(i,url)   //先爬取页数
-    //movie(u)
     v(i,url)
 }
 
