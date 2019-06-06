@@ -78,7 +78,8 @@ let insertdata = async () => {
 
 
 var rule = new schedule.RecurrenceRule();
-var hours = [1,5,9,13,17,21];
+var hours = [0,4,8,12,16,20];
+rule.minute = 30
 rule.hour = hours
 const  scheduleCronstyle = ()=>{
     schedule.scheduleJob(rule,()=>{
