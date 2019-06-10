@@ -1,8 +1,8 @@
 var express = require('express')()
-var page = 1   //爬取当前种子
-
-var url = `http://www.doutula.com/photo/list/?page=`  //页数
-
+var page = 1   //爬取当前页数
+var page2 = 1
+var url = `http://www.doutula.com/photo/list/?page=`  //url
+var url2 = `https://www.fabiaoqing.com/biaoqing/lists/page/`
 var data = [];     //放置数据
 
 var cheerio = require('cheerio')     //node端jquery
@@ -38,6 +38,13 @@ let test = (url,page)=>{
     },1000)
 }
 
+let test2 = (url,page) => {
+    console.log('开始爬取')
+    setTimeout(()=>{
+        list2(url,page)
+    },1000)
+}
+
 let list = (url,page) => {
     superagent.get(`${url}${page}`).charset('').end((err,res)=>{
         if (err){
@@ -57,9 +64,37 @@ let list = (url,page) => {
 
         if (page == 5){
             console.log('爬取完毕')
-            insertdata()
+            //insertdata()
+            console.log(data)
         } else {
             list(url,++page)
+        }
+    })
+}
+
+let list2 = (url,page) => {
+    superagent.get(`${url}${page}.html`).charset('').end((err,res)=>{
+        if (err){
+            console.log('出错啦')
+            console.log(err)
+            return err
+        }
+        console.log('开始爬取第'+page+'页')
+        var $ = cheerio.load(res.text,{decodeEntities: false});
+        $('#container .tagbqppdiv').each((index,item)=>{
+            var title = $(item).children('a').attr('title');
+            var url = $(item).find('.image').attr('data-original')
+            data.push({
+                url,title
+            })
+        })
+
+        if (page == 5){
+            console.log('爬取完毕')
+            insertdata()
+            console.log(data)
+        } else {
+            list(url2,++page2)
         }
     })
 }
@@ -81,6 +116,7 @@ var rule = new schedule.RecurrenceRule();
 var hours = [0,4,8,12,16,20];
 rule.minute = 30
 rule.hour = hours
+
 const  scheduleCronstyle = ()=>{
     schedule.scheduleJob(rule,()=>{
         test(url,page)
@@ -88,9 +124,11 @@ const  scheduleCronstyle = ()=>{
 }
 
 
+
 express.listen('30004',function () {
     console.log('启动成功')
-    scheduleCronstyle()
+    //scheduleCronstyle()
+    test2(url2,page2)
 })
 
 //test(url,page)
