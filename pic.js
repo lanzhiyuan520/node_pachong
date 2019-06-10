@@ -124,14 +124,14 @@ rule.minute = 30
 rule.hour = hours
 
 rule2.hour = hours2
-rule2.minute = 40
+rule2.minute = 43
 
 const  scheduleCronstyle = ()=>{
     schedule.scheduleJob(rule,()=>{
         test(url,page)
         data = []
     });
-    schedule.scheduleJob(rule,()=>{
+    schedule.scheduleJob(rule2,()=>{
         test2(url2,page2)
         data = []
     });
