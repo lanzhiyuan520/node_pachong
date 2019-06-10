@@ -94,16 +94,20 @@ let list2 = (url,page) => {
             insertdata()
             console.log(data)
         } else {
-            list(url2,++page2)
+            list2(url2,++page2)
         }
     })
 }
 
 let insertdata = async () => {
-    for (var i = 0; i < data.length;i++) {
+     for (var i = 0; i < data.length;i++) {
         let res = await sql(`select count(*) c from picture where url='${data[i].url}'`)
         if (res[0].c <= 0) {
-           let result = await sql(`insert into picture(title,url) values('${data[i].title}','${data[i].url}')`)
+            try {
+                let result = await sql(`insert into picture(title,url) values('${data[i].title}','${data[i].url}')`)
+            }catch (e) {
+                console.log('插入失败')
+            }
            console.log('插入成功')
         } else {
             console.log(data[i].title + '-存在了')
@@ -113,13 +117,23 @@ let insertdata = async () => {
 
 
 var rule = new schedule.RecurrenceRule();
+var rule2 = new schedule.RecurrenceRule();
 var hours = [0,4,8,12,16,20];
+var hours2 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
 rule.minute = 30
 rule.hour = hours
+
+rule2.hour = hours2
+rule2.minute = 40
 
 const  scheduleCronstyle = ()=>{
     schedule.scheduleJob(rule,()=>{
         test(url,page)
+        data = []
+    });
+    schedule.scheduleJob(rule,()=>{
+        test2(url2,page2)
+        data = []
     });
 }
 
@@ -127,8 +141,8 @@ const  scheduleCronstyle = ()=>{
 
 express.listen('30004',function () {
     console.log('启动成功')
-    //scheduleCronstyle()
-    test2(url2,page2)
+    scheduleCronstyle()
+    //test2(url2,page2)
 })
 
 //test(url,page)
