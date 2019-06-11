@@ -64,7 +64,7 @@ let list = (url,page) => {
 
         if (page == 5){
             console.log('爬取完毕')
-            //insertdata()
+            insertdata()
             console.log(data)
         } else {
             list(url,++page)
@@ -118,13 +118,12 @@ let insertdata = async () => {
 
 var rule = new schedule.RecurrenceRule();
 var rule2 = new schedule.RecurrenceRule();
-var hours = [0,4,8,12,16,20];
-var hours2 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
-rule.minute = 30
+var hours = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+rule.minute = 20
 rule.hour = hours
 
-rule2.hour = hours2
-rule2.minute = 43
+rule2.hour = hours
+rule2.minute = 40
 
 const  scheduleCronstyle = ()=>{
     schedule.scheduleJob(rule,()=>{
